@@ -340,17 +340,35 @@ class Reya(ccxt.Exchange, ImplicitAPI):
     #     return self.markets
 
     def fetch_markets(self, params: Optional[Dict] = None) -> List[Dict]:
-        if self.markets is None:
-            res = self.publicGetApiMarkets(params or {})
-            # the SDK/docs return a list of market objects
-            markets = res if isinstance(res, list) else self.safe_value(res, 'data', res)
-            self.markets = { self.safe_string(m, 'id', str(self.safe_integer(m,'market_id'))) : m for m in markets }
-            self.markets_by_id = self.markets
+        res = self.publicGetApiMarkets(params or {})
+        # the SDK/docs return a list of market objects
+        markets = res if isinstance(res, list) else self.safe_value(res, 'data', res)
+        self.markets = {self.safe_string(m, 'id', str(self.safe_integer(m,'market_id'))) : m for m in markets }
+        self.markets_by_id = self.markets
         out = []
         for mid, m in self.markets.items():
+            #print(m)
             quoteToken = m.get('quoteToken')
             underlyingAsset = m.get('underlyingAsset')
             symbol = f"{quoteToken}/{underlyingAsset}"
+            # out.append({
+            #     'id': self.safe_string(m, 'id'),
+            #     'symbol': symbol.upper(),
+            #     'base': quoteToken.upper() if quoteToken is not None else '',
+            #     'quote': underlyingAsset.upper() if underlyingAsset is not None else '',
+            #     'asset_pair_id': self.safe_string_2(m, 'assetPairId', 'asset_pair_id'),
+            #     'type': 'swap',
+            #     'spot': False,
+            #     'margin': False,
+            #     'swap': True,
+            #     'future': False,
+            #     'option': False,
+            #     'active': None,
+            #     'precision': {'amount': 2 if 'ETH' in quoteToken else 3},
+            #     'limits':{'cost':{'min':10}},
+            #     'info': m,
+            # })
+            #einmal perp
             out.append({
                 'id': self.safe_string(m, 'id'),
                 'symbol': f"{quoteToken}/{underlyingAsset}:{underlyingAsset}".upper(),
@@ -370,13 +388,12 @@ class Reya(ccxt.Exchange, ImplicitAPI):
             })
         return out
 
-    def fetch_funding_rate(self, symbol: str, params={}):
-        results = []
-        for symbol, market in self.markets.items():
-            if symbol == symbol:
+    def fetch_funding_rate(self, symbol: str, params: object = {}) -> FundingRate | None:
+        self.load_markets(reload=True) #require reload because funding data is written there
+        for sym, market in self.markets.items():
+            if sym == symbol:
                 fr = self._parse_funding_rate(symbol, market["info"])
                 return fr
-        #return results
 
     def _parse_funding_rate(self, symbol, market) -> FundingRate:
         #
@@ -991,6 +1008,7 @@ class Reya(ccxt.Exchange, ImplicitAPI):
                 if order_market_id is not None and str(order_market_id) == str(market_id):
                     item['symbol'] = symbol
                     filteredOrders.append(item)
+            return [self.parse_order(o) for o in filteredOrders]
         return [self.parse_order(o) for o in items]
 
     def fetch_my_trades(self, symbol: Optional[str] = None, since: Optional[int] = None, limit: Optional[int] = None,
@@ -1061,4 +1079,6 @@ class Reya(ccxt.Exchange, ImplicitAPI):
         signed = self.sign("api/trading/wallet/withdraw", "private", "POST", body, None, None)
         return self.request("api/trading/wallet/withdraw", 'private', 'POST', body, signed['headers'])
 
+    def get_current_stake_apy(self):
+        return self.request("api/trading/poolBalance/1", 'public', 'GET', {}, None)
 

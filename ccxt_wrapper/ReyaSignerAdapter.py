@@ -9,7 +9,7 @@ MAINNET = 1729
 
 
 '''
-Not working right now, to be less dependend on the phyton sdk of reha, this adapter should do the auth sign logic independent.
+Not working right now, to be less dependend on the phyton sdk of reya, this adapter should do the auth sign logic independent.
 '''
 class ReyaSignerAdapter:
     def __init__(self, private_key = 'privatekey', wallet_address='walletaddress', account_id=123, chain_id=TESTNET):
