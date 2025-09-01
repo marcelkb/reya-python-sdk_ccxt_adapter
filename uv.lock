@@ -1508,7 +1508,7 @@ wheels = [
 [[package]]
 name = "reya-python-sdk"
 version = "1.0.2"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "ccxt" },
     { name = "eth-abi" },

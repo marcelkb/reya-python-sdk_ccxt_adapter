@@ -1,0 +1,4 @@
+include README.md
+recursive-include sdk *
+recursive-include ccxt_wrapper *
+global-exclude __pycache__ *.py[cod]
