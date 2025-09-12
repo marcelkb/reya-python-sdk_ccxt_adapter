@@ -627,3 +627,4 @@ testing.py
 
 # End of https://www.gitignore.io/api/osx,python,pycharm,windows,visualstudio,visualstudiocode
 examples/config.json
+README_DEV.md
