@@ -273,6 +273,7 @@ class ApiClient:
 
         try:
             # perform request and return response
+            print(f"Calling API with method={method} url={url} header_params={header_params} body={body} post_params={post_params}")
             response_data = await self.rest_client.request(
                 method, url,
                 headers=header_params,
