@@ -36,6 +36,18 @@ def main():
     # print(f"Fetching ticker for {symbol}")
     ticker = exchange.fetch_ticker(symbol)
     print(f"{symbol} price: {ticker['last']}")
+    funding = exchange.fetch_funding_rate(symbol)
+    print(
+        f"funding rate for {funding['symbol']}: {funding['info']['fundingRate']}@{funding['interval']} , lastTime: {funding['fundingDatetime']}, yearly: {funding['info']['fundingRateAnnualized']}%")
+    funding = exchange.fetch_funding_rate("BTC/RUSD:RUSD")
+    print(
+        f"funding rate for {funding['info']['symbol']}: {funding['info']['fundingRate']}@{funding['interval']} , lastTime: {funding['fundingDatetime']}, yearly: {funding['info']['fundingRateAnnualized']}%")
+    position = exchange.fetch_position(symbol)
+    print(f"{position['info']['unrealisedPnl']} {position['info']['curRealisedPnl']} {position['info']['size']}")
+    print(exchange.fetch_open_orders(symbol))
+
+    # test sell
+
     #
     # # Fetch all open orders for the symbol
     # print(f"Fetching open orders for {symbol}")

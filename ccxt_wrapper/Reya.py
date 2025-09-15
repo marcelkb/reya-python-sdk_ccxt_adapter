@@ -330,6 +330,8 @@ class Reya(ccxt.Exchange, ImplicitAPI):
         symbol = self.safe_string_2(raw, 'symbol', 'ticker')
         symbol = self.convertSymbolToCcxtNotation(symbol)
 
+        raw['order_type'] = type
+
         status = raw.get('status').lower()
         return {
             "id": self.safe_string_2(raw, 'order_id', 'orderId'),
@@ -342,7 +344,7 @@ class Reya(ccxt.Exchange, ImplicitAPI):
             "price": self.safe_value_2(raw, 'limitPx', 'triggerPx'),
             "amount": self.safe_value(raw, 'qty', 0),
             "filled": self.safe_value(raw, 'execQty', 0),
-            "remaining": str(float(self.safe_value(raw, 'qty')) - float(self.safe_value(raw, 'execQty'))),
+            "remaining": str(float(self.safe_value(raw, 'qty', 0)) - float(self.safe_value(raw, 'execQty', 0))),
             "info": raw,
         }
 
@@ -452,8 +454,12 @@ class Reya(ccxt.Exchange, ImplicitAPI):
         oraclePx = 0
         fundingTimestamp = (int(math.floor(self.milliseconds()) / 60 / 60 / 1000) + 1) * 60 * 60 * 1000
 
+        additionalInfo = {}
+        additionalInfo['fundingDatetime'] = fundingTimestamp
+        additionalInfo['fundingRateAnnualized'] = funding * 24 * 365
+
         return {
-            'info': self.extend(market, summary),
+            'info': self.extend(market, summary, additionalInfo),
             'symbol': symbol,
             'markPrice': markPx,
             'indexPrice': oraclePx,
@@ -770,20 +776,11 @@ class Reya(ccxt.Exchange, ImplicitAPI):
 
         result = []
         for raw in positions:
-            market_id = None
             if symbol is not None:
-                market = self.markets.get(symbol)
-                if market is None:
-                    raise ccxt.ExchangeError(f"{self.id} fetch_order symbol {symbol} not found in markets")
-                market_id = market.get('exchangeId') or market.get('exchangeId') or None
-            if symbol is not None and market_id == raw.get('exchangeId'):
-                base_multiplier = self.safe_number(raw, 'base_multiplier', 1)
-
-                def safe_div(n, d):
-                    return (n / d) if (n is not None and d not in (None, 0)) else None
-
+                symbol = self.convertSymbolToReyaNotation(symbol)
+            if symbol is not None and raw.get("symbol") == symbol:
                 base_amount = self.safe_number(raw, 'qty')
-                mark_price = self.fetch_ticker(symbol)['last']
+                mark_price = self.fetch_ticker(self.convertSymbolToCcxtNotation(symbol))['last']
                 # #use avg price?
                 last_price = self.safe_number(raw, 'last_price')
                 # realized_pnl = safe_div(self.safe_number(raw, 'realized_pnl'), base_multiplier)
@@ -813,10 +810,10 @@ class Reya(ccxt.Exchange, ImplicitAPI):
                 if base_amount == 0: #0er position manuell filter
                     continue
 
-                leverage = self.fetch_leverage(symbol)
+                leverage = self.fetch_leverage(self.convertSymbolToCcxtNotation(symbol))
                 liquidationPrice = avg_entry * (1 - 1/leverage)
 
-                orders = self.fetch_open_orders(symbol)
+                orders = self.fetch_open_orders(self.convertSymbolToCcxtNotation(symbol))
                 tp = 0
                 sl = 0
                 for order in orders:
@@ -836,6 +833,10 @@ class Reya(ccxt.Exchange, ImplicitAPI):
                     "liquidationPrice": liquidationPrice,
                     "fundingValue": funding_value,
                 }
+
+                raw["size"] = base_amount
+                raw["curRealisedPnl"] = 0
+                raw["unrealisedPnl"] = pnl
 
                 safePosition = self.safe_position({
                     'info': raw,
@@ -952,6 +953,8 @@ class Reya(ccxt.Exchange, ImplicitAPI):
                         trigger_type=OrderType.SL,
                     )
                 ))
+            elif "reduceOnly" or "reduce_only" in params:
+                result: CreateOrderResponse = run_async(self.client.create_limit_order(limit_params))
         else:
             result:CreateOrderResponse = run_async(self.client.create_limit_order(limit_params))
 
@@ -960,6 +963,8 @@ class Reya(ccxt.Exchange, ImplicitAPI):
         if result is not None:
             id = result.order_id
             status = result.status
+        else:
+            result = {}
 
 
         return self.safe_order({ #TODO values
@@ -1002,7 +1007,6 @@ class Reya(ccxt.Exchange, ImplicitAPI):
     def cancel_order(self, id: str, symbol: Str = None, params={}):
         result:CancelOrderResponse = run_async(self.client.cancel_order(order_id=id))
         return result.status == "CANCELLED"
-
 
     def fetch_accounts(self, params={}):
         request = {"wallet_address": self.walletAddress}
@@ -1076,16 +1080,11 @@ class Reya(ccxt.Exchange, ImplicitAPI):
         request = {"wallet_address": self.walletAddress}
         items = self.public_get_open_orders(self.extend(request, params or {}))
 
-        # Filter by symbol if provided
         if symbol is not None:
-            market = self.markets.get(symbol)
-            if market is None:
-                raise ccxt.ExchangeError(f"{self.id} fetch_orders symbol {symbol} not found in markets")
-            market_id = market.get('id') or market.get('market_id') or None
+            symbol = self.convertSymbolToReyaNotation(symbol)
             filteredOrders = []
             for item in items:
-                order_market_id = item.get('market_id') or item.get('marketId') or None
-                if order_market_id is not None and str(order_market_id) == str(market_id):
+                if item.get('symbol') == symbol:
                     item['symbol'] = symbol
                     filteredOrders.append(item)
             return [self.parse_order(o) for o in filteredOrders]
