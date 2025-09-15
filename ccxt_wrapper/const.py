@@ -20,6 +20,7 @@ class EOrderSide(str, Enum):
 class EOrderStatus(str, Enum):
     CLOSED = "closed",
     PARTIALLY_FILLED = "partially-filled"
+    FILLED = "filled"
     REJECTED = "rejected"
     OPEN = "open"
     CANCELED = "canceled"
