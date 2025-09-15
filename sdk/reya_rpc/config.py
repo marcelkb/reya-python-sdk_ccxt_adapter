@@ -15,7 +15,7 @@ def get_network_addresses(chain_id: int) -> dict:
         return {
             "rpc_url": "https://rpc.reya.network",
             "passive_pool_account_id": 2,
-            "exchange_id": 1,
+            "exchange_id": 5,
             "core_address": "0xA763B6a5E09378434406C003daE6487FbbDc1a80",
             "multicall_address": "0xED28d27dFcA47AD2513C9f2e2d3C098C2eA5A47F",
             "oracle_adapter_address": "0x32edABC058C1207fE0Ec5F8557643c28E4FF379e",
