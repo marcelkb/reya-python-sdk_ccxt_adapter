@@ -9,7 +9,7 @@ Right now not all methods functions are implemented.
  - fetchBalance only recognized staked RUSD (0xa9f32a851b1800742e47725da54a09a7ef2556a3). Different Tokens for Collateral are not supported right now (wrtETH f.e.)
  - fetch_canceled_and_closed_orders not supported right now
  - setLeverage not supported right now (no reya api endpoint)
- - no short order handling intern by order placement
+ - short orders can be placed but are not fully considered by profit calculation
    
 # Reya Python SDK
 
