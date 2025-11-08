@@ -15,6 +15,35 @@ Right now not all methods functions probably and it more like a POC.
 
 This repository contains a Python SDK for interacting with the Reya ecosystem. It provides tools for subscribing to the Reya WebSocket for market data updates and executing on-chain actions via RPC.
 
+For installation and inclusion in another projects use
+
+```
+pip install {localpath}\reya-python-sdk_ccxt_adapter   
+or
+pip install git+https://github.com/marcelkb/reya-python-sdk_ccxt_adapter
+```
+
+## Usage
+
+```
+from reya_ccxt_wrapper.Reya import Reya
+from reya_ccxt_wrapper.const import EOrderSide, EOrderType
+from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
+
+    load_dotenv()
+    config = TradingConfig.from_env()
+
+    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
+    exchange = Reya({
+        'walletAddress': config.wallet_address,
+        'privateKey': config.private_key,
+        'options':{'account_id': config.account_id},
+        'verbose': True,
+    })
+    client = ReyaTradingClient()
+    exchange.withClient(client)
+
+```
 
 ## Features
 

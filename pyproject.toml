@@ -45,7 +45,7 @@ dev = [
 packages = [
     {include = "examples"},
     {include = "sdk"},
-    {include = "ccxt_wrapper"}
+    {include = "reya_ccxt_wrapper"}
 ]
 
 [build-system]

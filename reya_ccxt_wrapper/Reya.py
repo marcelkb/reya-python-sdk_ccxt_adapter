@@ -39,8 +39,8 @@ from typing import Optional, Dict, Any, List
 
 from ccxt.base.types import Str, Int, FundingRate, OrderSide, Num, Strings
 
-from ccxt_wrapper.abstract.Reya import ImplicitAPI
-from ccxt_wrapper.const import EOrderSide, EOrderStatus, EOrderType
+from reya_ccxt_wrapper.abstract.Reya import ImplicitAPI
+from reya_ccxt_wrapper.const import EOrderSide, EOrderStatus, EOrderType
 from sdk.open_api import CreateOrderResponse, TimeInForce, CancelOrderResponse, OrderType
 from sdk.reya_rest_api import ReyaTradingClient
 from sdk.reya_rest_api.config import REYA_DEX_ID
@@ -965,6 +965,7 @@ class Reya(ccxt.Exchange, ImplicitAPI):
             status = result.status
         else:
             result = {}
+            return None
 
 
         return self.safe_order({ #TODO values

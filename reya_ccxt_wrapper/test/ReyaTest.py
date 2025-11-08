@@ -2,8 +2,8 @@ import logging
 
 from dotenv import load_dotenv
 
-from ccxt_wrapper.Reya import Reya
-from ccxt_wrapper.const import EOrderSide, EOrderType
+from reya_ccxt_wrapper.Reya import Reya
+from reya_ccxt_wrapper.const import EOrderSide, EOrderType
 from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
 
 
