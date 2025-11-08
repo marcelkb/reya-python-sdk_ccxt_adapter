@@ -15,7 +15,7 @@ def main():
     load_dotenv()
     config = TradingConfig.from_env()
 
-    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
+    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.owner_wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
     exchange = Reya({
         'walletAddress': config.owner_wallet_address,
         'privateKey': config.private_key,

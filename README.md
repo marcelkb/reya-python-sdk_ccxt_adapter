@@ -33,18 +33,46 @@ from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
     load_dotenv()
     config = TradingConfig.from_env()
 
-    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
+    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.owner_wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
     exchange = Reya({
-        'walletAddress': config.wallet_address,
+        'walletAddress': config.owner_wallet_address,
         'privateKey': config.private_key,
         'options':{'account_id': config.account_id},
         'verbose': True,
     })
     client = ReyaTradingClient()
     exchange.withClient(client)
-
+    
+    symbol = 'SOL/RUSD:RUSD'  # market symbol
+    ticker = exchange.fetch_ticker(symbol)
+    print(f"{symbol} price: {ticker['last']}")
+    
+    position = exchange.fetch_position(symbol)
+    print(f"{position['info']['unrealisedPnl']} {position['info']['curRealisedPnl']} {position['info']['size']}")
+    
+    print(f"Creating LIMIT BUY order for {symbol}")
+    print(exchange.create_order(symbol, EOrderType.LIMIT.value, EOrderSide.BUY.value, AMOUNT, ticker['last'] * 0.5))
+  
+    print(f"Creating TAKE PROFIT MARKET SELL order for {symbol}")
+        print(exchange.create_order(
+            symbol,
+            EOrderType.MARKET.value,
+            EOrderSide.SELL.value,
+            AMOUNT,
+            ticker['last'] * 1.01,
+            params={'takeProfitPrice': '250', 'reduceOnly': True}
+        ))
+    
+    print(f"Creating STOP LOSS MARKET SELL order for {symbol}")
+        print(exchange.create_order(
+            symbol,
+            EOrderType.MARKET.value,
+            EOrderSide.SELL.value,
+            AMOUNT,
+            ticker['last'] * 1.01,
+            params={'stopLossPrice': '100', 'reduceOnly': True}
+        ))
 ```
-
 
 ## Versioning
 
