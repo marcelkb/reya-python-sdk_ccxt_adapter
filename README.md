@@ -54,24 +54,24 @@ from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
     print(exchange.create_order(symbol, EOrderType.LIMIT.value, EOrderSide.BUY.value, AMOUNT, ticker['last'] * 0.5))
   
     print(f"Creating TAKE PROFIT MARKET SELL order for {symbol}")
-        print(exchange.create_order(
-            symbol,
-            EOrderType.MARKET.value,
-            EOrderSide.SELL.value,
-            AMOUNT,
-            ticker['last'] * 1.01,
-            params={'takeProfitPrice': '250', 'reduceOnly': True}
-        ))
+    print(exchange.create_order(
+        symbol,
+        EOrderType.MARKET.value,
+        EOrderSide.SELL.value,
+        AMOUNT,
+        ticker['last'] * 1.01,
+        params={'takeProfitPrice': '250', 'reduceOnly': True}
+    ))
     
     print(f"Creating STOP LOSS MARKET SELL order for {symbol}")
-        print(exchange.create_order(
-            symbol,
-            EOrderType.MARKET.value,
-            EOrderSide.SELL.value,
-            AMOUNT,
-            ticker['last'] * 1.01,
-            params={'stopLossPrice': '100', 'reduceOnly': True}
-        ))
+    print(exchange.create_order(
+        symbol,
+        EOrderType.MARKET.value,
+        EOrderSide.SELL.value,
+        AMOUNT,
+        ticker['last'] * 1.01,
+        params={'stopLossPrice': '100', 'reduceOnly': True}
+    ))
 ```
 
 ## Versioning
