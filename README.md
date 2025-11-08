@@ -45,6 +45,19 @@ from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
 
 ```
 
+
+## Versioning
+
+The SDK uses a 4-digit semantic versioning scheme: `X.Y.Z.W`
+
+- **X.Y.Z**: Matches the first three digits of the API specifications tag (major.minor.patch)
+- **W**: Build number that increments automatically for SDK-only changes
+
+For example, if the API specs are at version `2.0.3`, the SDK versions will be `2.0.3.0`, `2.0.3.1`, `2.0.3.2`, etc. When the API specs update to `2.0.4`, the SDK will reset to `2.0.4.0`.
+
+This ensures the SDK version always reflects compatibility with the underlying API specifications while allowing for independent SDK improvements and bug fixes.
+
+
 ## Features
 
 ### REST API Client
@@ -199,7 +212,17 @@ PRIVATE_KEY=your_private_key
 CHAIN_ID=1729                   # Use 89346162 for testnet
 REYA_WS_URL=wss://ws.reya.xyz/  # Use wss://websocket-testnet.reya.xyz/ for testnet
 REYA_API_BASE_URL=https://api.reya.xyz/v2  # Use https://api-test.reya.xyz/v2 for testnet
+OWNER_WALLET_ADDRESS=your_wallet_address    # Required: wallet address for data queries
 ```
+
+### Signer vs Owner Wallet
+
+The SDK distinguishes between two wallet concepts:
+
+- **Signer Wallet**: The wallet that signs transactions and orders (derived from `PRIVATE_KEY`)
+- **Owner Wallet**: The wallet whose data you want to query (positions, orders, balances, etc.)
+
+In most cases, these are the same wallet (set `OWNER_WALLET_ADDRESS` to the address derived from your `PRIVATE_KEY`). However, in Reya DEX, one address can trade on behalf of another wallet. The `OWNER_WALLET_ADDRESS` is used for all wallet data query methods (`get_positions()`, `get_open_orders()`, etc.), while order signatures always use the signer wallet address.
 ### Resource-Based API Structure
 
 #### REST API Structure

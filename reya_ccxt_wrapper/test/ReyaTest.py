@@ -17,7 +17,7 @@ def main():
 
     #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
     exchange = Reya({
-        'walletAddress': config.wallet_address,
+        'walletAddress': config.owner_wallet_address,
         'privateKey': config.private_key,
         'options':{'account_id': config.account_id},
         'verbose': True,
