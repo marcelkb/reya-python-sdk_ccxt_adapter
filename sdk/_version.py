@@ -15,7 +15,8 @@ def _get_version() -> str:
             pyproject_data = tomllib.load(f)
         return str(pyproject_data["project"]["version"])
     except (FileNotFoundError, KeyError, Exception):
-        raise ValueError("Failed to read version from pyproject.toml")
-
+        #raise ValueError("Failed to read version from pyproject.toml")
+        #do not work if packaged as lib, fallback ro real number
+        return "2.0.6.1"
 
 SDK_VERSION = _get_version()
