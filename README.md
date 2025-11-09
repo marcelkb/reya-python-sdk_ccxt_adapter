@@ -6,10 +6,12 @@ It adds an CCXT Wrapper purely python based by using the direct request calls fo
 Right now not all methods functions are implemented.
  - fetchOHLCV delegates to Binance since Reya only support candles up to 1D-Timeframe and no easy management for calling last X Candles. Start und End Time is needed every time. Additonally the api is not as fast for complicated calculations based on a lot of candles.
  - The Signer for Private calls is not finished, so it relays on the SDK functions.
- - fetchBalance only recognized staked RUSD (0xa9f32a851b1800742e47725da54a09a7ef2556a3). Different Tokens for Collateral are not supported right now (wrtETH f.e.)
+ - fetchBalance only recognized RUSD. Different Tokens for Collateral are not supported right now (wrtETH f.e.)
  - fetch_canceled_and_closed_orders not supported right now
  - setLeverage not supported right now (no reya api endpoint)
  - short orders can be placed but are not fully considered by profit calculation
+
+If you prefer a streamlined repo without the reya sdk integrated take a look at https://github.com/marcelkb/reya-ccxt-adapter
    
 # Reya Python SDK
 
@@ -23,6 +25,19 @@ or
 pip install git+https://github.com/marcelkb/reya-python-sdk_ccxt_adapter
 ```
 
+## Environment Setup
+
+Create a `.env` file in the project root with the following variables:
+
+```
+ACCOUNT_ID=your_account_id
+PRIVATE_KEY=your_private_key
+CHAIN_ID=1729                   # Use 89346162 for testnet
+REYA_WS_URL=wss://ws.reya.xyz/  # Use wss://websocket-testnet.reya.xyz/ for testnet
+REYA_API_BASE_URL=https://api.reya.xyz/v2  # Use https://api-test.reya.xyz/v2 for testnet
+OWNER_WALLET_ADDRESS=your_wallet_address    # Required: wallet address for data queries
+```
+
 ## Usage
 
 ```
@@ -33,7 +48,6 @@ from sdk.reya_rest_api import TradingConfig, ReyaTradingClient
     load_dotenv()
     config = TradingConfig.from_env()
 
-    #signer = ReyaSignerAdapter(private_key = config.private_key, wallet_address=config.owner_wallet_address, account_id=config.account_id, chain_id=config.chain_id) TODO not working right now
     exchange = Reya({
         'walletAddress': config.owner_wallet_address,
         'privateKey': config.private_key,
@@ -230,18 +244,6 @@ For example, the response might look like:
 ]
 ```
 
-## Environment Setup
-
-Create a `.env` file in the project root with the following variables:
-
-```
-ACCOUNT_ID=your_account_id
-PRIVATE_KEY=your_private_key
-CHAIN_ID=1729                   # Use 89346162 for testnet
-REYA_WS_URL=wss://ws.reya.xyz/  # Use wss://websocket-testnet.reya.xyz/ for testnet
-REYA_API_BASE_URL=https://api.reya.xyz/v2  # Use https://api-test.reya.xyz/v2 for testnet
-OWNER_WALLET_ADDRESS=your_wallet_address    # Required: wallet address for data queries
-```
 
 ### Signer vs Owner Wallet
 

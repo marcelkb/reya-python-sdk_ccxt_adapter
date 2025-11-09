@@ -22,8 +22,6 @@ def main():
         'options':{'account_id': config.account_id},
         'verbose': True,
     })
-    client = ReyaTradingClient()
-    exchange.withClient(client)
     symbol = 'SOL/RUSD:RUSD'  # market symbol
 
     ORDER_PLACEMENT = True
